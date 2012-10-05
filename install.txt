@@ -1,0 +1,2 @@
+npm install jsftp
+npm install node-class
