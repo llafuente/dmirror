@@ -9,6 +9,7 @@ var $ = require("node-class"),
         online: true,
     });
 
+$.debug = console.log;
 
 function rm_tree(directory, callback) {
     path.exists(directory, function(exists) {
@@ -77,6 +78,7 @@ FS.extends(Mirror);
 
 FS.implements({
     __construct: function(options) {
+        this.parent();
         $.debug("fs config", options);
         this.__options = options;
     },
@@ -104,7 +106,9 @@ FS.implements({
         $.debug("put", source_path, "@", destination_path);
 
         fs.readFile(source_path, "binary", function(err, data) {
+            console.log("put/read", err);
             fs.writeFile(this.__options.dir + "/" + destination_path, data, "binary", function(err, res) {
+                console.log("put/put", err);
                 if(err) { this.__manage_error(err); }
 
                 $.debug("put@done", source_path, "@", destination_path);

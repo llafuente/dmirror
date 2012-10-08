@@ -14,6 +14,7 @@ FTP.extends(Mirror);
 
 FTP.implements({
     __construct: function(options) {
+        this.parent();
         $.debug("ftp config", options);
         this.ftp = new FTPClient(options);
         this.__options = options;

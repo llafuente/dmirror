@@ -66,7 +66,7 @@ Raid.implements({
 
         //this.event_emitter.periodical(this.__cfg.polling, this);
 
-        this.__action_queue = new $.Seq();
+        this.__action_queue = new $.Sequence();
     },
     get_files_under: function(filelist, directory) {
         var i= filelist.length,
@@ -215,8 +215,9 @@ Raid.implements({
     },
 
     watch_directory: function(file_stat) {
-        if(!path.existsSync(file_stat.full_file_name)) return ;
-        if(!file_stat.isDirectory()) return ;
+        if(!path.existsSync(file_stat.full_file_name) || !file_stat.isDirectory()) {
+            return;
+        }
 
         $.debug("watch: ", file_stat.full_file_name, " --> " , file_stat.relative_directory);
 
@@ -313,7 +314,7 @@ Raid.implements({
                         this.__target.put(file_data.full_file_name, file_data.relative_file_name, function() {
                             work.done();
                         });
-                    }.bind(this));
+                    }.bind(this)).fire();
                 } else {
                     //something could be renamed?!
                     this.event_emitter_rename();
@@ -374,7 +375,7 @@ Raid.implements({
                             this.__target.rmdir(file_data.relative_file_name, function() {
                                 work.done();
                             });
-                        }.bind(this));
+                        }.bind(this)).fire();
                         action_done = true;
                     } else {
                         $.error("--> rm", file_data.relative_file_name);
@@ -382,7 +383,7 @@ Raid.implements({
                             this.__target.rm(file_data.relative_file_name, function() {
                                 work.done();
                             });
-                        }.bind(this));
+                        }.bind(this)).fire();
                         action_done = true;
                     }
 
@@ -394,7 +395,7 @@ Raid.implements({
                             this.__target.mkdir(file_data.relative_file_name, function() {
                                 work.done();
                             });
-                        }.bind(this));
+                        }.bind(this)).fire();
                         this.watch_directory(file_data);
                         action_done = true;
                     } else {
@@ -404,7 +405,7 @@ Raid.implements({
                             this.__target.put(file_data.full_file_name, file_data.relative_file_name, function() {
                                 work.done();
                             });
-                        }.bind(this));
+                        }.bind(this)).fire();
                         action_done = true;
                     }
                 }
@@ -436,7 +437,7 @@ Raid.implements({
                         this.__target.mv(diff[0].relative_file_name, diff[1].relative_file_name, function() {
                             work.done();
                         });
-                    }.bind(this));
+                    }.bind(this)).fire();
                     action_done = true;
                 }
             default:
@@ -465,7 +466,7 @@ Raid.implements({
                             this.__target.rmlist(files, directories, function() {
                                 work.done();
                             });
-                        }.bind(this));
+                        }.bind(this)).fire();
                         action_done = true;
                     }
 
@@ -490,7 +491,7 @@ Raid.implements({
                             this.__target.putlist(files, directories, function() {
                                 work.done();
                             });
-                        }.bind(this));
+                        }.bind(this)).fire();
                         action_done = true;
                     }
                 }

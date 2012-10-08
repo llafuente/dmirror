@@ -1,36 +1,42 @@
 var Raid = require("./../raid.js"),
     fs = require("fs");
 
+
+var dir = "c:/noboxout/dmirror/test/t1",
+    dir2 ="c:/noboxout/dmirror/test/t2";
+try {
+    fs.mkdirSync(dir, function() {});
+    fs.mkdirSync(dir2, function() {});
+} catch(e) {}
+
 var r = null;
 r = new Raid({
-    source: "c:/noboxout/dmirror/test",
+    source: dir,
     protocol: "fs",
     target: {
-        dir: "c:/noboxout/dmirror/test2",
+        dir: dir2,
     },
     exclude: [new RegExp("/^\./")],
     polling: 1000,
 
 });
 
-
-var dir = "c:/noboxout/dmirror/test";
 var test = [
-    /*
+
     //rename file test
     function() {
         console.log("test: put file.txt");
         fs.writeFileSync(dir+"/file.txt", "test me!", 'utf-8');
     },
+
     function() {
         console.log("test: mv file.txt new-file.txt");
         fs.renameSync(dir+"/file.txt", dir+"/new-file.txt");
     },
     function() {
         console.log("test: rm new-file.txt");
-        fs.unlinkSync(dir+"/new-file.txt");
+        //fs.unlinkSync(dir+"/new-file.txt");
     },
-
     //rename directory test (empty)
     function() {
         console.log("test: mkdir /path");
@@ -42,9 +48,8 @@ var test = [
     },
     function() {
         console.log("test: rmdir /new-path");
-        fs.rmdirSync(dir+"/new-path");
+        //fs.rmdirSync(dir+"/new-path");
     },
-
     //rename directory test (not empty)
     function() {
         console.log("test: mkdir /path");
@@ -63,7 +68,7 @@ var test = [
         fs.unlinkSync(dir+"/new-path2/file.txt");
         fs.rmdirSync(dir+"/new-path2");
     },
-    */
+
     function() {
         console.log("test: paste!");
         fs.mkdirSync(dir+"/paste-path");
@@ -90,7 +95,7 @@ var test = [
     function() {
         console.log("test: raname all paste (5/5)");
         fs.writeFileSync(dir+"/paste-path/path2-renamed/renamed.txt", "test me twice - and rename!", 'utf-8');
-    },/*
+    },
     function() {
         console.log("test: clean up");
         fs.unlinkSync(dir+"/paste-path/path2-renamed/renamed.txt");
@@ -98,8 +103,6 @@ var test = [
         fs.rmdirSync(dir+"/paste-path/path2-renamed");
         fs.rmdirSync(dir+"/paste-path");
     },
-/*
-
     function() {
         fs.writeFileSync(dir+"/hell.txt", "test me!", 'utf-8');
     },
@@ -130,7 +133,6 @@ var test = [
             fs.rmdirSync(dir+"/the-new-path");
         } catch(e) {}
     },
-*/
 ];
 
 setTimeout(function() {

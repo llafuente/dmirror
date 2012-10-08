@@ -28,7 +28,7 @@ var Mirror = new $.Class("Mirror", {
 
 Mirror.extends($.Events);
 
-Mirror.abstract({
+Mirror.abstract(Object.keys({
     connect: function() {},
     disconnect: function() {},
     mv: function(source_path, destination_path, cb_fn) {},
@@ -36,7 +36,7 @@ Mirror.abstract({
     rmdir: function(relative_path, cb_fn) {},
     rm: function(destination_path, cb_fn) {},
     mkdir: function(destination_path, cb_fn) {},
-});
+}));
 
 Mirror.final({
     __manage_error: function(err) {
@@ -60,7 +60,7 @@ Mirror.implements({
     rmlist: function(files, directories, cb_fn) {
         $.debug("rmlist", files, directories);
 
-        var seq = new $.Seq();
+        var seq = new $.Sequence();
 
         var i = files.length;
         while(i--) {
@@ -94,13 +94,13 @@ Mirror.implements({
 
             $.debug("rmlist@done");
             cb_fn();
-        });
+        }).fire();
     },
     putlist: function(files, directories, cb_fn) {
 
         $.debug("putlist", files, directories);
 
-        var seq = new $.Queue();
+        var seq = new $.Sequence();
 
         directories = this.sort_directories(directories);
         directories.reverse();
@@ -134,9 +134,8 @@ Mirror.implements({
 
             $.debug("putlist@done");
             cb_fn();
-        });
-
-    },
+        }).fire();
+    }
 });
 
 
