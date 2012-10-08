@@ -1,61 +1,20 @@
-var Raid = require('./raid.js'),
-    fs = require('fs');
+var Raid = require("./../raid.js"),
+    fs = require("fs");
 
-/*
-var actions = new $.Queue();
-actions.push(function(work) {
-    $.error("1");
-    setTimeout(function() {
-        $.error("2 ");
-        work.done();
-    }, 500);
-
-});
-actions.push(function(work) {
-    $.error("3");
-    setTimeout(function() {
-        $.error("4 ");
-        work.done();
-    }, 500);
-
-});
-
-
-setInterval(function() {
-    console.log("tick");
-}, 1000);
-return ;
-*/
-
-//ftp://operaworld.es:opera12Ab@ftp.operaworld.es/html/wp-content/themes/twentyeleven/test
 var r = null;
-if(false) {
-    r = new Raid({
-        source: "c:/noboxout/raid/test",
-        protocol: "ftp",
-        target: {
-            host: "ftp.operaworld.es",
-            user: "operaworld.es",
-            pass: "opera12Ab",
-            dir: "/html/wp-content/themes/twentyeleven/test",
-        },
-        exclude: [new RegExp("/^\./")],
-    });
-} else {
-    r = new Raid({
-        source: "c:/noboxout/raid/test",
-        protocol: "fs",
-        target: {
-            dir: "c:/noboxout/raid/test2",
-        },
-        exclude: [new RegExp("/^\./")],
-        polling: 1000,
+r = new Raid({
+    source: "c:/noboxout/dmirror/test",
+    protocol: "fs",
+    target: {
+        dir: "c:/noboxout/dmirror/test2",
+    },
+    exclude: [new RegExp("/^\./")],
+    polling: 1000,
 
-    });
-}
+});
 
 
-var dir = "c:/noboxout/raid/test";
+var dir = "c:/noboxout/dmirror/test";
 var test = [
     /*
     //rename file test
