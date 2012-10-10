@@ -1,2 +1,3 @@
 npm install jsftp
 npm install node-class
+npm install winston
