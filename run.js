@@ -1,4 +1,4 @@
-var Raid = require("./raid.js"),
+var Raid = require("./lib/dmirror.js"),
     winston = require("winston");
 
 winston.add(winston.transports.File, { filename: "log" });
