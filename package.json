@@ -32,16 +32,14 @@
   "dependencies": {
     "jsftp": ">=0.5.1",
     "node-class": ">=0.0.24",
-    "winston": ">=0.6.2",
-    "tap": ">=0.3.2"
+    "winston": ">=0.6.2"
   },
   "devDependencies": {
+    "tap": ">=0.3.2"
   },
   "main": "./index.js",
-  "scripts": {
-  },
   "engines": {
     "node": ">= 0.8.0"
   },
-  "readme": "# dmirror\nMirror a directory to another directory in the filesystem or FTP (like a Raid but without blocking)",
+  "readme": "# dmirror\nMirror a directory to another directory in the filesystem or FTP (like a Raid but without blocking)"
 }
