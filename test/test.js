@@ -1,165 +1,212 @@
-var Raid = require("./../raid.js"),
-    fs = require("fs");
+var Raid = require("../index.js").Raid,
+    fs = require("fs"),
+    path = require("path"),
+    winston = require("winston"),
+    src_dir = path.join(path.dirname(process.mainModule.filename), "src"),
+    dst_dir = path.join(path.dirname(process.mainModule.filename), "dst"),
+    tap = require("tap"),
+    test = tap.test,
+    g_timeout = 1000;
 
+winston.add(winston.transports.File, { filename: "log" });
+winston.remove(winston.transports.Console);
 
-var dir = "c:/noboxout/dmirror/test/t1",
-    dir2 ="c:/noboxout/dmirror/test/t2";
 try {
-    fs.mkdirSync(dir, function() {});
-    fs.mkdirSync(dir2, function() {});
+    fs.mkdirSync(src_dir, function() {});
+    fs.mkdirSync(dst_dir, function() {});
 } catch(e) {}
 
 var r = null;
 r = new Raid({
-    source: dir,
+    source: src_dir,
     protocol: "fs",
     target: {
-        dir: dir2,
+        dir: dst_dir,
     },
     exclude: [new RegExp("/^\./")],
     polling: 1000,
-
+    loggin: winston
 });
 
-var test = [
 
-    //rename file test
-    function() {
-        console.log("test: put file.txt");
-        fs.writeFileSync(dir+"/file.txt", "test me!", 'utf-8');
-    },
+test("test: put file.txt", function(t) {
+    var content = "test me!";
+    fs.writeFileSync(src_dir+"/file.txt", content, 'utf8');
 
-    function() {
-        console.log("test: mv file.txt new-file.txt");
-        fs.renameSync(dir+"/file.txt", dir+"/new-file.txt");
-    },
-    function() {
-        console.log("test: rm new-file.txt");
-        //fs.unlinkSync(dir+"/new-file.txt");
-    },
-    //rename directory test (empty)
-    function() {
-        console.log("test: mkdir /path");
-        fs.mkdirSync(dir+"/path");
-    },
-    function() {
-        console.log("test: mv /path /new-path");
-        fs.renameSync(dir+"/path", dir+"/new-path");
-    },
-    function() {
-        console.log("test: rmdir /new-path");
-        //fs.rmdirSync(dir+"/new-path");
-    },
-    //rename directory test (not empty)
-    function() {
-        console.log("test: mkdir /path");
-        fs.mkdirSync(dir+"/path");
-    },
-    function() {
-        console.log("test: mv /path /new-path2");
-        fs.renameSync(dir+"/path", dir+"/new-path2");
-    },
-    function() {
-        console.log("test: put /new-path2/file.txt");
-        fs.writeFileSync(dir+"/new-path2/file.txt", "test me!", 'utf-8');
-    },
-    function() {
-        console.log("test: rmdir /new-path2");
-        fs.unlinkSync(dir+"/new-path2/file.txt");
-        fs.rmdirSync(dir+"/new-path2");
-    },
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/file.txt"), true, "file found");
+        t.equal(fs.readFileSync(dst_dir+"/file.txt", 'utf8'), content, "content is correct");
+        t.end();
+    }, g_timeout);
+});
 
-    function() {
-        console.log("test: paste!");
-        fs.mkdirSync(dir+"/paste-path");
-        fs.mkdirSync(dir+"/paste-path/path2");
-        fs.writeFileSync(dir+"/paste-path/file.txt", "test me!", 'utf-8');
-        fs.writeFileSync(dir+"/paste-path/path2/file.txt", "test me twice!", 'utf-8');
-    },
-    function() {
-        console.log("test: raname all paste (1/5)");
-        fs.renameSync(dir+"/paste-path/file.txt", dir+"/paste-path/renamed.txt");
-    },
-    function() {
-        console.log("test: raname all paste (2/5)");
-        fs.renameSync(dir+"/paste-path/path2/file.txt", dir+"/paste-path/path2/renamed.txt");
-    },
-    function() {
-        console.log("test: raname all paste (3/5)");
-        fs.renameSync(dir+"/paste-path/path2", dir+"/paste-path/path2-renamed");
-    },
-    function() {
-        console.log("test: raname all paste (4/5)");
-        fs.renameSync(dir+"/paste-path/path2-renamed/file.txt", dir+"/paste-path/path2-renamed/renamed.txt");
-    },
-    function() {
-        console.log("test: raname all paste (5/5)");
-        fs.writeFileSync(dir+"/paste-path/path2-renamed/renamed.txt", "test me twice - and rename!", 'utf-8');
-    },
-    function() {
-        console.log("test: clean up");
-        fs.unlinkSync(dir+"/paste-path/path2-renamed/renamed.txt");
-        fs.unlinkSync(dir+"/paste-path/renamed.txt");
-        fs.rmdirSync(dir+"/paste-path/path2-renamed");
-        fs.rmdirSync(dir+"/paste-path");
-    },
-    function() {
-        fs.writeFileSync(dir+"/hell.txt", "test me!", 'utf-8');
-    },
-    function() {
-        fs.writeFileSync(dir+"/hell.txt", "test me2!", 'utf-8');
-    },
-    function() {
-        fs.renameSync(dir+"/hell.txt", dir+"/new-hell.txt");
-    },
-    function() {
-        fs.mkdirSync(dir+"/the-new-path");
-    },
-    function() {
-        fs.renameSync(dir+"/the-new-path", dir+"/the-new-path-to-liberty");
-    },
-    function() {
-        fs.rmdirSync(dir+"/the-new-path-to-liberty");
-    },
-    function() {
-        fs.unlinkSync(dir+"/new-hell.txt");
-    },
-    function() {
-        fs.mkdirSync(dir+"/the-new-path");
-        fs.writeFileSync(dir+"/the-new-path/hell.txt", "test me!", 'utf-8');
-    },
-    function() {
-        try {
-            fs.rmdirSync(dir+"/the-new-path");
-        } catch(e) {}
-    },
-];
+test("test: mv file.txt new-file.txt", function(t) {
+    fs.renameSync(src_dir+"/file.txt", src_dir+"/new-file.txt");
 
-setTimeout(function() {
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-file.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+test("test: rm new-file.txt", function(t) {
+    fs.unlinkSync(src_dir+"/new-file.txt");
 
-    var test_running = 0;
-    var runtest = function() {
-        if(test[test_running]) {
-
-            //check who am i whatching
-
-            console.log("----------- wachting----------");
-            var i = r.__watchs.length;
-            while(i--) {
-                console.log(r.__watchs[i].file_stat.full_file_name);
-            }
-            console.log("-----------------------------");
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-file.txt"), false, "file found");
+        t.end();
+    }, g_timeout);
+});
 
 
-            try {
-                test[test_running]();
-            } catch(e) {
-                console.log(e);
-            }
-            ++test_running;
-        }
-    };
+test("test: mkdir /path", function(t) {
+    fs.mkdirSync(src_dir+"/path");
 
-    runtest.periodical(2000);
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/path"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
 
-}, 1000);
+test("test: mv /path /new-path", function(t) {
+    fs.renameSync(src_dir+"/path", src_dir+"/new-path");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-path"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: rmdir /new-path", function(t) {
+    fs.rmdirSync(src_dir+"/new-path");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-path"), false, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+
+test("test: mkdir /new-path2 && put /new-path2/file.txt", function(t) {
+    fs.mkdirSync(src_dir+"/new-path2");
+    var content = "test me!";
+    fs.writeFileSync(src_dir+"/new-path2/file.txt", content, 'utf8');
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-path2"), true, "file found");
+        t.equal(fs.existsSync(dst_dir+"/new-path2/file.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: mv /new-path2 /new-path3", function(t) {
+    fs.renameSync(src_dir+"/new-path2", src_dir+"/new-path3");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-path3"), true, "file found");
+        t.equal(fs.existsSync(dst_dir+"/new-path3/file.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+
+test("test: rm /new-path3/file.txt && rmdir /new-path3", function(t) {
+        fs.unlinkSync(src_dir+"/new-path3/file.txt");
+        fs.rmdirSync(src_dir+"/new-path3");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/new-path3"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/new-path3/file.txt"), false, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+
+test("test: paste test", function(t) {
+    fs.mkdirSync(src_dir+"/paste-path");
+    fs.mkdirSync(src_dir+"/paste-path/path2");
+    fs.writeFileSync(src_dir+"/paste-path/file.txt", "test me!", 'utf8');
+    fs.writeFileSync(src_dir+"/paste-path/path2/file.txt", "test me twice!", 'utf8');
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/paste-path"), true, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2"), true, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/file.txt"), true, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2/file.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+test("test: raname all paste (1/5)", function(t) {
+    fs.renameSync(src_dir+"/paste-path/file.txt", src_dir+"/paste-path/renamed.txt");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/paste-path/file.txt"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/renamed.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: raname all paste (2/5)", function(t) {
+    fs.renameSync(src_dir+"/paste-path/path2/file.txt", src_dir+"/paste-path/path2/renamed.txt");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2/file.txt"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2/renamed.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: raname all paste (3/5)", function(t) {
+    fs.renameSync(src_dir+"/paste-path/path2", src_dir+"/paste-path/path2-renamed");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2-renamed"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: raname all paste (4/5)", function(t) {
+    fs.renameSync(src_dir+"/paste-path/path2-renamed/renamed.txt", src_dir+"/paste-path/path2-renamed/file.txt");
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2-renamed/renamed.txt"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2-renamed/file.txt"), true, "file found");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: raname all paste (5/5)", function(t) {
+    var content = "test me twice - and rename!";
+    fs.writeFileSync(src_dir+"/paste-path/path2-renamed/renamed.txt", content, 'utf8');
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2-renamed/renamed.txt"), true, "file found");
+        t.equal(fs.readFileSync(dst_dir+"/paste-path/path2-renamed/renamed.txt", 'utf8'), content, "content is correct");
+        t.end();
+    }, g_timeout);
+});
+
+test("test: cleanup", function(t) {
+
+    fs.unlinkSync(src_dir+"/paste-path/path2-renamed/file.txt");
+    fs.unlinkSync(src_dir+"/paste-path/path2-renamed/renamed.txt");
+    fs.unlinkSync(src_dir+"/paste-path/renamed.txt");
+    fs.rmdirSync(src_dir+"/paste-path/path2-renamed");
+
+    setTimeout(function() {
+        fs.rmdirSync(src_dir+"/paste-path");
+
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2-renamed/renamed.txt"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/renamed.txt"), false, "file found");
+        t.equal(fs.existsSync(dst_dir+"/paste-path/path2-renamed"), false, "file found");
+        setTimeout(function() {
+            t.equal(fs.existsSync(dst_dir+"/paste-path"), false, "file found");
+
+            t.end();
+            setTimeout(function() {
+                process.exit();
+            }, g_timeout);
+        }, g_timeout);
+    }, g_timeout);
+});
+

@@ -1,6 +1,6 @@
 {
   "name": "dmirror",
-  "description": "Mirror a directory to another directory in the filesystem or FTP (like a Raid but without blocking)",
+  "description": "Mirror a directory to another directory in the filesystem or FTP (like a Raid but without blocking), you can plug your own if other target is needed.",
   "version": "0.0.1",
   "author": {
     "name": "Luis Lafuente, Noboxout.",
@@ -13,28 +13,28 @@
     "url": "https://github.com/llafuente/dmirror.git"
   },
   "keywords": [
-    "raid",
     "mirror",
+    "raid",
+    "synchronization",
+    "filesystem",
+    "mirroring",
     "directory",
-    "sync",
+    "mirrorfolder",
+    "rsync"
   ],
   "dependencies": {
-    "jsftp": "x.x.x",
-    "node-class": "x.x.x",
-    "winston": "x.x.x",
+    "jsftp": ">=0.5.1",
+    "node-class": ">=0.0.24",
+    "winston": ">=0.6.2",
+    "tap": ">=0.3.2"
   },
   "devDependencies": {
   },
-  "main": "./lib/dmirror",
+  "main": "./index.js",
   "scripts": {
   },
   "engines": {
     "node": ">= 0.8.0"
   },
   "readme": "# dmirror\nMirror a directory to another directory in the filesystem or FTP (like a Raid but without blocking)",
-  "_id": "winston@0.6.2",
-  "dist": {
-    "shasum": "9e5edc9afea3ab8e048d738da6f41eccaad50038"
-  },
-  "_from": "winston"
 }
