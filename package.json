@@ -32,7 +32,8 @@
   "dependencies": {
     "jsftp": ">=0.5.1",
     "node-class": ">=0.0.24",
-    "winston": ">=0.6.2"
+    "winston": ">=0.6.2",
+    "rimraf": ">=2.1.4"
   },
   "devDependencies": {
     "tap": ">=0.3.2"
