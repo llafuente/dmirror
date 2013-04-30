@@ -25,7 +25,7 @@ var r = null;
 r = new Raid({
     source: src_dir,
     protocol: "fs",
-	recursive: false,
+	recursive: true,
     target: {
         dir: dst_dir,
     },

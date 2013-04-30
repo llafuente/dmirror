@@ -1,10 +1,9 @@
 # dmirror [![Build Status](https://secure.travis-ci.org/llafuente/dmirror.png?branch=master)](http://travis-ci.org/llafuente/dmirror)
 =======
 
-Nodejs file mirror with multiple filesystem: ftp, fs (atm)
+A real-time folder synchronization on Windows/Linux/Mac (any platform that NodeJS support) support multiple target protocols: FileSystem and FTP.
 
-
-Still in development
+Rather stable
 
 
 Setup
@@ -36,6 +35,9 @@ FTP
             dir: "/html/",
         },
         exclude: [new RegExp("/^\./")],
+		loggin: winston,
+		//optional
+		recursive: true, // true by default
     });
 
 ```
@@ -51,8 +53,10 @@ Filesystem
 			dir: "x:/bls/tyr/home2/",
 		},
 		exclude: [new RegExp("\.svn")],
-		polling: 1000,
-		loggin: winston
+		polling: 1000, // 500 by default
+		loggin: winston,
+		//optional
+		recursive: true, // true by default
 	});
 
 ```
@@ -60,12 +64,14 @@ Filesystem
 FAQ
 =======
 
-* Can I mirror to a network drive?
+* Can I mirror a samba directory?
 
-Yes, use filesystem :)
+Yes, you need to "Connect to a network drive" and the protocol is filesystem :)
 
 
 TODO LIST
 =======
 
-* fill an issue if you need anything more, for me is what i was looking for a replacement for mirrorfolder.
+* Windows service support, could be great.
+
+* fill an issue if you need anything more, for me is what i was looking for a replacement/alternative to mirrorfolder.
