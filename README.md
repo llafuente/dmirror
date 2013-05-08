@@ -7,20 +7,22 @@ The real-time synchronization (Raid class) mirror all changes in the other side 
 Status: No error found, so stable :)
 
 
-Real-time folder synchronization
-=======
-
-Common
+Common for the following examples.
+If you want to know more... take a look to the test I try to cover 100% the code.
 
 ```js
 
-    var Raid = require("./lib/dmirror.js").Raid,
+    var Raid = require("./index.js").Raid,
+        Sync = require("./index.js").Sync,
         winston = require("winston");
 
     winston.add(winston.transports.File, { filename: "log" });
     winston.remove(winston.transports.Console);
 
 ```
+
+Real-time folder synchronization
+=======
 
 FTP
 
@@ -51,7 +53,7 @@ Filesystem
         source: "<source folder>",
         protocol: "fs",
         target: {
-			dir: "<target folder>"
+            dir: "<target folder>"
         },
         exclude: [new RegExp("\.svn")],
         polling: 1000, // 500 by default
@@ -70,10 +72,9 @@ FTP is not supported atm.
 Filesystem
 
 ```js
-    var Sync = require("./lib/dmirror.js").Sync,
-
     var sync = new Sync({
-        src: "<source folder>",
+        source: "<source folder>",
+        loggin: winston,
         protocol: "fs",
         target: {
             dir: "<target folder>",
