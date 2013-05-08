@@ -1,5 +1,5 @@
 var Raid = require("../index.js").Raid,
-	Sync = require("../index.js").Sync,
+    Sync = require("../index.js").Sync,
     fs = require("fs"),
     path = require("path"),
     winston = require("winston"),
@@ -9,13 +9,10 @@ var Raid = require("../index.js").Raid,
     tap = require("tap"),
     test = tap.test,
     g_timeout = 1000,
-	rimraf = require("rimraf");
-	
-	
-
+    rimraf = require("rimraf");
 
 winston.add(winston.transports.File, { filename: "log" });
-//winston.remove(winston.transports.Console);
+winston.remove(winston.transports.Console);
 
 //clear
 try { rimraf.sync(src_dir); } catch(e) {}
@@ -24,6 +21,7 @@ try { rimraf.sync(dst2_dir); } catch(e) {}
 try { fs.mkdirSync(src_dir, function() {}); } catch(e) {}
 try { fs.mkdirSync(dst_dir, function() {}); } catch(e) {}
 try { fs.mkdirSync(dst2_dir, function() {}); } catch(e) {}
+try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log")); } catch(e) {}
 
 var r = null;
 r = new Raid({
@@ -39,8 +37,9 @@ r = new Raid({
 });
 
 var sync = new Sync({
-    src: src_dir,
+    source: src_dir,
     protocol: "fs",
+    loggin: winston,
     target: {
         dir: dst2_dir,
     }
@@ -58,9 +57,9 @@ test("mirror test: put ñfile.txt", function(t) {
     }, g_timeout);
 });
 test("sync test: put ñfile.txt", function(t) {
-	var content = "test ñ me!";
-	sync.sync();
-	
+    var content = "test ñ me!";
+    sync.sync();
+
     setTimeout(function() {
         t.equal(fs.existsSync(dst2_dir+"/ñfile.txt"), true, "file /ñfile.txt created");
         t.equal(fs.readFileSync(dst2_dir+"/ñfile.txt", 'utf8'), content, "content of /ñfile.txt is correct");
@@ -80,7 +79,7 @@ test("mirror test: put áfile.txt", function(t) {
 });
 
 test("sync test: put áfile.txt", function(t) {
-	var content = "test ñ me!";
+    var content = "test ñ me!";
     sync.sync();
 
     setTimeout(function() {
@@ -127,8 +126,8 @@ test("mirror test: mkdir /ú€ath", function(t) {
         t.equal(fs.existsSync(dst2_dir+"/ú€ath"), true, "directory /ú€ath created");
         t.end();
 
-		setTimeout(function() {
-			process.exit();
-		}, g_timeout);
+        setTimeout(function() {
+            process.exit();
+        }, g_timeout);
     }, g_timeout);
 });

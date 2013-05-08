@@ -9,15 +9,6 @@ var Sync = require("../index.js").Sync,
     g_timeout = 2000,
     rimraf = require("rimraf");
 
-var sync = new Sync({
-    src: src_dir,
-    protocol: "fs",
-    target: {
-        dir: dst_dir,
-    }
-});
-
-
 winston.add(winston.transports.File, { filename: "log" });
 winston.remove(winston.transports.Console);
 
@@ -26,7 +17,16 @@ try { rimraf.sync(src_dir); } catch(e) {}
 try { rimraf.sync(dst_dir); } catch(e) {}
 try { fs.mkdirSync(src_dir, function() {}); } catch(e) {}
 try { fs.mkdirSync(dst_dir, function() {}); } catch(e) {}
+try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log")); } catch(e) {}
 
+var sync = new Sync({
+    source: src_dir,
+    loggin: winston,
+    protocol: "fs",
+    target: {
+        dir: dst_dir,
+    }
+});
 
 test("test: put file.txt", function(t) {
     var content = "test me!";

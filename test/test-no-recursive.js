@@ -7,19 +7,17 @@ var Raid = require("../index.js").Raid,
     tap = require("tap"),
     test = tap.test,
     g_timeout = 1000,
-	rimraf = require("rimraf");
-	
-	
-
+    rimraf = require("rimraf");
 
 winston.add(winston.transports.File, { filename: "log" });
-//winston.remove(winston.transports.Console);
+winston.remove(winston.transports.Console);
 
 //clear
 try { rimraf.sync(src_dir); } catch(e) {}
 try { rimraf.sync(dst_dir); } catch(e) {}
 try { fs.mkdirSync(src_dir, function() {}); } catch(e) {}
 try { fs.mkdirSync(dst_dir, function() {}); } catch(e) {}
+try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log")); } catch(e) {}
 
 var r = null;
 r = new Raid({
@@ -78,7 +76,7 @@ test("test: mv /path /new-path", function(t) {
 
     setTimeout(function() {
         t.equal(fs.existsSync(dst_dir+"/new-path"), true, "directory /new-path created");
-		t.equal(fs.existsSync(dst_dir+"/path"), false, "directory must no exists: /path (moved)");
+        t.equal(fs.existsSync(dst_dir+"/path"), false, "directory must no exists: /path (moved)");
         t.end();
     }, g_timeout);
 });
@@ -111,10 +109,10 @@ test("test: mv /new-path2 /new-path3", function(t) {
     setTimeout(function() {
         t.equal(fs.existsSync(dst_dir+"/new-path3"), true, "directory /new-path3 found");
         t.equal(fs.existsSync(dst_dir+"/new-path3/file.txt"), false, "file /new-path3/file.txt found");
-		
+
         t.equal(fs.existsSync(dst_dir+"/new-path2"), false, "directory /new-path2 found");
         t.equal(fs.existsSync(dst_dir+"/new-path2/file.txt"), false, "file /new-path2/file.txt found");
-		
+
         t.end();
     }, g_timeout);
 });

@@ -8,14 +8,18 @@ var FSMirror = require("../index.js").FS,
     g_timeout = 2000,
     rimraf = require("rimraf");
 
-var mirror = new FSMirror({
-    dir: dst_dir
-});
+winston.add(winston.transports.File, { filename: "log" });
+winston.remove(winston.transports.Console);
 
 //clear
 try { rimraf.sync(dst_dir); } catch(e) {}
 try { fs.mkdirSync(dst_dir, function() {}); } catch(e) {}
+try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log")); } catch(e) {}
 
+var mirror = new FSMirror({
+    dir: dst_dir,
+    loggin: winston
+});
 
 test("test: mkdirlist", function(t) {
 

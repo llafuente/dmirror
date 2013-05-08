@@ -9,15 +9,6 @@ var Sync = require("../index.js").Sync,
     g_timeout = 2000,
     rimraf = require("rimraf");
 
-var sync = new Sync({
-    src: src_dir,
-    protocol: "fs",
-    target: {
-        dir: dst_dir,
-    }
-});
-
-
 winston.add(winston.transports.File, { filename: "log" });
 winston.remove(winston.transports.Console);
 
@@ -26,35 +17,44 @@ try { rimraf.sync(src_dir); } catch(e) {}
 try { rimraf.sync(dst_dir); } catch(e) {}
 try { fs.mkdirSync(src_dir, function() {}); } catch(e) {}
 try { fs.mkdirSync(dst_dir, function() {}); } catch(e) {}
+try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log")); } catch(e) {}
 
+var sync = new Sync({
+    source: src_dir,
+    loggin: winston,
+    protocol: "fs",
+    target: {
+        dir: dst_dir,
+    }
+});
 
 function filter_24h(list) {
-	var i,
-		max,
-		output = []
-		min_date = (new Date()).getTime() - (60 * 60 * 24 * 1000);
+    var i,
+        max,
+        output = []
+        min_date = (new Date()).getTime() - (60 * 60 * 24 * 1000);
 
-	for(i = 0, max = list.length; i < max; ++i) {
-		if(list[i].directory) {
-			output.push(list[i]);
-		} else {
-			console.log(list[i].mtime.getTime() , min_date);
-			if (list[i].mtime.getTime() > min_date) {
-				output.push(list[i]);
-			}
-		}
-	}
+    for(i = 0, max = list.length; i < max; ++i) {
+        if(list[i].directory) {
+            output.push(list[i]);
+        } else {
+            console.log(list[i].mtime.getTime() , min_date);
+            if (list[i].mtime.getTime() > min_date) {
+                output.push(list[i]);
+            }
+        }
+    }
 
-	return output;
+    return output;
 }
 
 test("test: put file.txt 48hour before ", function(t) {
     var content = "test me!",
-		date = new Date();
-	date.setTime( date.getTime() - (60 * 60 * 24 * 1000 * 2) );
+        date = new Date();
+    date.setTime( date.getTime() - (60 * 60 * 24 * 1000 * 2) );
 
     fs.writeFileSync(src_dir+"/file.txt", content, 'utf8');
-	fs.utimesSync(src_dir+"/file.txt", date, date);
+    fs.utimesSync(src_dir+"/file.txt", date, date);
 
     sync.sync(filter_24h);
 

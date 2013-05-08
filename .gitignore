@@ -17,4 +17,5 @@ node_modules
 
 test/src
 test/dst
+test/dst2
 log
