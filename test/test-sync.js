@@ -22,6 +22,7 @@ try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log"))
 var sync = new Sync({
     source: src_dir,
     exclude: [new RegExp("exclude.txt", "g")],
+    recursive: true,
     loggin: winston,
     protocol: "fs",
     target: {
