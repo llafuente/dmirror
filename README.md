@@ -90,10 +90,45 @@ FAQ
 
 Yes, you need to "Connect to a network drive" and the protocol is filesystem :)
 
+There are some problems involved that you may encounter if you run sync/raid against samba using the "windows task scheduler".
+You may see that you don't have access to the share resource (wtf!). So you need to create that resource each time (workaround!)
+
+Solve it with this code, fill the "<blanks>".
+
+```js
+    var spawn = require('child_process').spawn,
+        //delete current connection to the resource
+        connect_delete  = spawn('net', ['use', '\\\\<server>\\<folder>', '/DELETE']);
+
+    connect_delete.on('close', function (code) {
+        winston.log("error", 'net use delete exit with: ' + code);
+        //when fisnish, reconnect the resource, you may need user/pwd
+        connect  = spawn('net', ['use', 'x:','\\\\<server>\\<folder>', '/USER:<domain>\\<user>', '<password>'])
+        connect.stderr.setEncoding('utf8');
+        connect.stdout.setEncoding('utf8');
+
+        connect.stdout.on('data', function (data) {
+            winston.log("info", data);
+        });
+
+        connect.stderr.on('data', function (data) {
+            winston.log("error", data);
+        });
+
+        connect.on('close', function (code) {
+          winston.log("error", 'net use exit with: ' + code);
+          setTimeout(function() {
+            sync.sync(); // access the resource!
+          }, 10000); // give a few seconds to windows...
+        });
+    });
+```
+
+
 
 TODO LIST
 =======
 
-* Windows service support, could be great.
+* Windows taskbar support, I will develop the module if I have time... sometime...
 
 * fill an issue if you need anything more, for me is what i was looking for a replacement/alternative to mirrorfolder.

@@ -21,6 +21,7 @@ try { fs.unlinkSync(path.join(path.dirname(process.mainModule.filename), "log"))
 
 var sync = new Sync({
     source: src_dir,
+    exclude: [new RegExp("exclude.txt", "g")],
     loggin: winston,
     protocol: "fs",
     target: {
@@ -123,6 +124,20 @@ test("test: put many files", function(t) {
         t.equal(fs.readFileSync(dst_dir+"/path3/file2.txt", 'utf8'), content, "content of /path3/file.txt is correct");
         t.equal(fs.readFileSync(dst_dir+"/path3/path4/file.txt", 'utf8'), content, "content of /path3/path4/file.txt is correct");
         t.equal(fs.readFileSync(dst_dir+"/path3/path4/path5/file.txt", 'utf8'), content, "content of /path3/path4/path5/file.txt is correct");
+
+        t.end();
+    }, g_timeout);
+});
+
+
+test("test: put exclude.txt", function(t) {
+    var content = "test me 5th!";
+    fs.writeFileSync(src_dir+"/exclude.txt", content, 'utf8');
+
+    sync.sync();
+
+    setTimeout(function() {
+        t.equal(fs.existsSync(dst_dir+"/exclude.txt"), false, "file /exclude.txt exists");
 
         t.end();
     }, g_timeout);
